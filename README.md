@@ -30,7 +30,7 @@ Per pubblicare la versione attuale carica insieme `index.html`, `og-image.jpg`,
 `og-image2.jpg`, `gaia-mobile-480.webp` e `gaia-mobile-960.webp`.
 Le due nuove immagini pesano circa 29 e 110 KB e sono selezionate dal browser
 in base allo schermo. Il pulsante “Apri in Google Maps” apre la scheda del locale.
-Il modulo resta configurato con salvataggio locale.
+Il modulo invia le risposte a Formspree.
 
 Le sezioni seguenti descrivono anche la configurazione originale con foto incorporate.
 
@@ -86,9 +86,15 @@ e il sito resta perfettamente equilibrato.
 
 ## Salvare le risposte RSVP
 
-Di default `RSVP_CONFIG.driver` è `"local"`: le risposte restano nel browser di chi compila
-(utile per provare, **non** per raccogliere davvero le conferme). Per salvarle sul serio
-cambia il driver.
+Il driver attivo è `"formspree"`, con endpoint `https://formspree.io/f/mqpklqab`.
+Il sito invia un POST JSON con i dati del modulo, la data di invio e l'oggetto
+`RSVP compleanno Gaia — Nome Cognome`. Mostra la conferma solo dopo una risposta
+HTTP positiva; in caso di errore mantiene il modulo compilato per riprovare.
+L'invio non salva le risposte nel localStorage. L'endpoint serverless `rsvp.js`
+non viene usato con questa configurazione.
+
+I driver alternativi seguenti richiedono la relativa configurazione. Il driver
+`"local"` è disponibile solo per prove: conserva le risposte nel browser di chi compila.
 
 ### Supabase
 

@@ -710,7 +710,7 @@ body::after{
             <button class="btn btn--ghost guest-counter__button" id="partecipanti-plus" type="button" aria-label="Aumenta il numero di partecipanti">+</button>
           </div>
           <input type="hidden" id="partecipanti" name="partecipanti" value="1">
-          <p class="hint" id="riepilogo-partecipanti" role="status" aria-live="polite">Confermi per 1 persona: tu.</p>
+          <p class="hint" id="riepilogo-partecipanti" role="status" aria-live="polite">Confermo solo per me</p>
           <span class="error" id="err-partecipanti" role="alert"></span>
         </fieldset>
 
@@ -749,8 +749,8 @@ body::after{
       <div class="done" id="done" tabindex="-1">
         <svg class="done__mark" aria-hidden="true" viewBox="0 0 24 24"><use href="#s-bloom"/></svg>
         <p class="done__title" id="done-title">Grazie!</p>
-        <p class="done__text" id="done-text">La tua risposta è stata registrata. Non vediamo l'ora di festeggiare insieme.</p>
-        <button class="done__link" type="button" id="done-edit">Devi correggere qualcosa? Invia una nuova risposta</button>
+        <p class="done__text" id="done-text">La tua risposta è stata registrata. Non vediamo l'ora di festeggiare con tutti voi.</p>
+        <button class="done__link" type="button" id="done-edit">Devi correggere qualcosa?<br>Invia una nuova risposta</button>
       </div>
     </div>
   </section>
@@ -1113,9 +1113,11 @@ const Maps = {
     try {
       await RsvpStore.save(data);
       form.style.display = "none";
+      $("#rsvp-title").hidden = true;
+      $(".rsvp__sub").hidden = true;
       $("#done-title").textContent = data.presenza === "si" ? "Grazie! ♡" : "Grazie per la tua risposta ♡";
       $("#done-text").textContent = data.presenza === "si"
-        ? `La tua conferma per ${data.partecipanti === 1 ? "1 persona" : data.partecipanti + " persone"} è stata registrata. Non vediamo l'ora di festeggiare insieme.`
+        ? `La tua conferma per ${data.partecipanti === 1 ? "1 persona" : data.partecipanti + " persone"} è stata registrata. Non vediamo l'ora di festeggiare con tutti voi.`
         : "Ci mancherai, sarà per la prossima volta.";
       done.classList.add("is-open");
       done.focus();
@@ -1131,6 +1133,8 @@ const Maps = {
   $("#done-edit").addEventListener("click", () => {
     done.classList.remove("is-open");
     form.style.display = "";
+    $("#rsvp-title").hidden = false;
+    $(".rsvp__sub").hidden = false;
     form.reset();
     toggle(blocks.partecipanti, false);
     toggle(blocks.allergie, false);
