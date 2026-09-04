@@ -818,7 +818,8 @@ photo: {
    B. PERSISTENZA RSVP — adapter sostituibile
    ============================================================ */
 const RSVP_CONFIG = {
-  driver: "local",                    // "local" | "rest" | "supabase" | "firebase"
+  driver: "formspree",
+  formspree: { endpoint: "https://formspree.io/f/mqpklqab" },
   rest:     { endpoint: "/api/rsvp" },
   supabase: { url: "", anonKey: "", table: "rsvp" },
   firebase: { projectId: "", collection: "rsvp" }
@@ -826,6 +827,22 @@ const RSVP_CONFIG = {
 
 const RsvpStore = (() => {
   const drivers = {
+    async formspree(record) {
+      const res = await fetch(RSVP_CONFIG.formspree.endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          ...record,
+          subject: `RSVP compleanno Gaia — ${record.nome} ${record.cognome}`
+        })
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || `HTTP ${res.status}`);
+      }
+      return { ok: true, storage: "formspree" };
+    },
+
     async local(record) {
       const key = "rsvp:gaia:" + EVENT.date;
       const all = JSON.parse(localStorage.getItem(key) || "[]");
@@ -881,7 +898,8 @@ const RsvpStore = (() => {
 
   return {
     async save(record) {
-      const driver = drivers[RSVP_CONFIG.driver] || drivers.local;
+      const driver = drivers[RSVP_CONFIG.driver];
+      if (typeof driver !== "function") throw new Error("Configurazione RSVP non valida.");
       return driver({ ...record, createdAt: new Date().toISOString() });
     }
   };
