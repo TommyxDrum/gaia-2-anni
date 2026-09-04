@@ -2,19 +2,18 @@
 
 ## Conferme singole e di gruppo
 
-Chi partecipa sceglie “Solo per me” oppure “Per me e altre persone”. Nel secondo
-caso inserisce i nominativi degli accompagnatori, uno per riga (massimo 19): il
-totale comprende automaticamente chi compila. Il campo facoltativo “Allergie e
-intolleranze” sostituisce le note e permette di indicare la persona interessata.
+Il modulo presenta prima presenza/assenza, poi nome e cognome, quindi il
+contatore con i pulsanti “−” e “+”, da 1 a 10 persone totali, incluso chi compila.
+Seguono allergie/intolleranze e note facoltative. Il contatore e i campi alimentari
+appaiono solo per chi partecipa; un'assenza viene salvata con zero partecipanti.
 
-Le risposte includono `gruppo` (`solo` / `insieme`) e `accompagnatori` (testo con
-un nominativo per riga), oltre al totale `partecipanti` e ai campi alimentari.
-Il campo `note` non viene più inviato. Se configuri Supabase con la tabella
-dell'esempio qui sotto, aggiungi prima le colonne:
+Le risposte includono `gruppo` (`solo` / `insieme`, derivato dal totale),
+`partecipanti`, i campi alimentari e `note`. I nominativi degli accompagnatori
+non sono più richiesti. Se configuri Supabase con la tabella dell'esempio
+qui sotto, aggiungi prima la colonna:
 
 ```sql
 alter table rsvp add column if not exists gruppo text;
-alter table rsvp add column if not exists accompagnatori text;
 ```
 
 ## Aggiornamento mobile

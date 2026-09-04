@@ -330,6 +330,9 @@ body::after{
 @media(min-width:820px){.rsvp .deco--balloons{width:150px;right:8vw}}
 
 .form{margin-top:var(--s8);max-width:560px}
+.guest-counter{display:flex;align-items:center;gap:16px;margin-top:16px}
+.guest-counter__button{width:54px;min-height:54px;padding:0;font-size:26px;line-height:1}
+.guest-counter__value{min-width:52px;text-align:center;font-family:var(--display);font-size:32px;font-variant-numeric:tabular-nums}
 .field{margin-bottom:var(--s6)}
 .field > label,.field legend{display:block;font-size:14.5px;font-weight:500;margin-bottom:var(--s3)}
 .hint{display:block;font-weight:400;color:var(--ink-soft);font-size:13px;margin-top:2px}
@@ -674,6 +677,15 @@ body::after{
       <p class="rsvp__sub reveal reveal-d1">Facci sapere se festeggerai insieme a Gaia. Bastano trenta secondi.</p>
 
       <form class="form reveal reveal-d1" id="rsvp-form" novalidate>
+        <fieldset class="field" aria-describedby="err-presenza">
+          <legend>Parteciperai?</legend>
+          <div class="choice">
+            <label><input type="radio" name="presenza" value="si" required><span>Sì, ci sarò</span></label>
+            <label><input type="radio" name="presenza" value="no"><span>Purtroppo non potrò esserci</span></label>
+          </div>
+          <span class="error" id="err-presenza" role="alert"></span>
+        </fieldset>
+
         <div class="field">
           <label for="nome">Nome</label>
           <input class="input" id="nome" name="nome" type="text" autocomplete="given-name" required aria-describedby="err-nome">
@@ -686,29 +698,15 @@ body::after{
           <span class="error" id="err-cognome" role="alert"></span>
         </div>
 
-        <fieldset class="field" aria-describedby="err-presenza">
-          <legend>Parteciperai?</legend>
-          <div class="choice">
-            <label><input type="radio" name="presenza" value="si" required><span>Sì, ci sarò</span></label>
-            <label><input type="radio" name="presenza" value="no"><span>Purtroppo non potrò esserci</span></label>
-          </div>
-          <span class="error" id="err-presenza" role="alert"></span>
-        </fieldset>
-
         <fieldset class="field conditional" id="blocco-partecipanti">
-          <legend>Per chi confermi?</legend>
-          <div class="choice">
-            <label><input type="radio" name="gruppo" value="solo" checked><span>Solo per me</span></label>
-            <label><input type="radio" name="gruppo" value="insieme"><span>Per me e altre persone</span></label>
+          <legend>Per quante persone confermi?</legend>
+          <p class="hint" id="hint-partecipanti">Da 1 a 10 persone, te compreso. Includi anche i bambini.</p>
+          <div class="guest-counter" role="group" aria-label="Numero di partecipanti" aria-describedby="hint-partecipanti err-partecipanti">
+            <button class="btn btn--ghost guest-counter__button" id="partecipanti-minus" type="button" aria-label="Diminuisci il numero di partecipanti" disabled>−</button>
+            <output class="guest-counter__value" id="partecipanti-value" aria-label="Totale partecipanti">1</output>
+            <button class="btn btn--ghost guest-counter__button" id="partecipanti-plus" type="button" aria-label="Aumenta il numero di partecipanti">+</button>
           </div>
-          <div class="conditional" id="blocco-accompagnatori">
-            <label for="accompagnatori">Chi verrà con te?</label>
-            <p class="hint" id="hint-accompagnatori">Scrivi nome e cognome di ogni altra persona, uno per riga, inclusi i bambini. Non aggiungere il tuo nome. Puoi indicare fino a 19 persone.</p>
-            <textarea class="textarea" id="accompagnatori" name="accompagnatori" rows="4" maxlength="2000"
-                      placeholder="Es. Monica Rossi&#10;Luca Rossi"
-                      aria-describedby="hint-accompagnatori err-accompagnatori"></textarea>
-            <span class="error" id="err-accompagnatori" role="alert"></span>
-          </div>
+          <input type="hidden" id="partecipanti" name="partecipanti" value="1">
           <p class="hint" id="riepilogo-partecipanti" role="status" aria-live="polite">Confermi per 1 persona: tu.</p>
           <span class="error" id="err-partecipanti" role="alert"></span>
         </fieldset>
@@ -725,6 +723,12 @@ body::after{
           </div>
           <span class="error" id="err-allergie" role="alert"></span>
         </fieldset>
+
+        <div class="field">
+          <label for="note">Note <span class="hint">Facoltativo. C'è altro che vuoi farci sapere?</span></label>
+          <textarea class="textarea" id="note" name="note" rows="3" maxlength="500" aria-describedby="err-note"></textarea>
+          <span class="error" id="err-note" role="alert"></span>
+        </div>
 
         <div class="form__foot">
           <p class="privacy">I dati inseriti saranno utilizzati esclusivamente per organizzare la festa e gestire le conferme di partecipazione. Non vengono usati per marketing o profilazione.</p>
@@ -892,16 +896,13 @@ const Validation = {
 
     if (data.presenza === "si") {
       const n = Number(data.partecipanti);
-      if (!Number.isInteger(n) || n < 1 || n > 20) e.partecipanti = "Indica un numero da 1 a 20.";
+      if (!Number.isInteger(n) || n < 1 || n > 10) e.partecipanti = "Indica un numero da 1 a 10.";
       if (data.allergie !== "si" && data.allergie !== "no") e.allergie = "Facci sapere se ci sono allergie.";
       if (data.allergie === "si" && (!data.allergieDettaglio || data.allergieDettaglio.trim().length < 3))
         e.allergieDettaglio = "Scrivi quali allergie o intolleranze.";
       if (data.allergieDettaglio.length > 500) e.allergieDettaglio = "Usa al massimo 500 caratteri.";
-      const guests = data.accompagnatori.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-      if (data.gruppo === "insieme" && !guests.length) e.accompagnatori = "Indica almeno una persona che verrà con te.";
-      if (guests.length > 19 || data.accompagnatori.length > 2000) e.accompagnatori = "Puoi indicare al massimo 19 persone, entro 2000 caratteri.";
-      if (guests.some(s => s.length < 3 || s.length > 100)) e.accompagnatori = "Controlla i nominativi: usa da 3 a 100 caratteri per persona.";
     }
+    if (data.note.length > 500) e.note = "Usa al massimo 500 caratteri.";
     if (!data.consenso) e.consenso = "Serve il consenso per registrare la risposta.";
     return e;
   },
@@ -1070,27 +1071,28 @@ const Maps = {
   const form = $("#rsvp-form"), done = $("#done"), status = $("#form-status");
   const blocks = {
     partecipanti: $("#blocco-partecipanti"),
-    allergie: $("#blocco-allergie"),
-    accompagnatori: $("#blocco-accompagnatori")
+    allergie: $("#blocco-allergie")
   };
   const toggle = (el, open) => el.classList.toggle("is-open", open);
-  const guestNames = () => $("#accompagnatori").value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-  const updateGroup = () => {
-    const together = form.elements.gruppo.value === "insieme";
-    toggle(blocks.accompagnatori, together);
-    const total = 1 + (together ? guestNames().length : 0);
+  const updateCounter = (value = Number(form.elements.partecipanti.value)) => {
+    const total = Math.max(1, Math.min(10, Number.isFinite(value) ? Math.trunc(value) : 1));
+    form.elements.partecipanti.value = String(total);
+    $("#partecipanti-value").value = String(total);
+    $("#partecipanti-minus").disabled = total === 1;
+    $("#partecipanti-plus").disabled = total === 10;
     $("#riepilogo-partecipanti").textContent = total === 1
       ? "Confermi per 1 persona: tu."
       : `Confermi per ${total} persone in totale, te compreso.`;
   };
-  $$('input[name="gruppo"]').forEach(r => r.addEventListener("change", updateGroup));
-  $("#accompagnatori").addEventListener("input", updateGroup);
+  $("#partecipanti-minus").addEventListener("click", () => updateCounter(Number(form.elements.partecipanti.value) - 1));
+  $("#partecipanti-plus").addEventListener("click", () => updateCounter(Number(form.elements.partecipanti.value) + 1));
+  updateCounter();
 
   $$('input[name="presenza"]').forEach(r => r.addEventListener("change", () => {
     const going = r.value === "si" && r.checked;
     toggle(blocks.partecipanti, going);
     toggle(blocks.allergie, going);
-    updateGroup();
+    updateCounter();
   }));
 
   const clearErrors = () => {
@@ -1103,7 +1105,7 @@ const Maps = {
     const map = {
       nome: "#err-nome", cognome: "#err-cognome", presenza: "#err-presenza",
       partecipanti: "#err-partecipanti", allergie: "#err-allergie",
-      accompagnatori: "#err-accompagnatori",
+      note: "#err-note",
       allergieDettaglio: "#err-allergie-dettaglio", consenso: "#err-consenso"
     };
     Object.entries(errors).forEach(([k, msg]) => {
@@ -1117,7 +1119,7 @@ const Maps = {
       const box = first.closest(".field") || first.closest("fieldset") || first.closest(".form__foot");
       if (box) {
         box.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
-        const focusable = box.querySelector("input,textarea");
+        const focusable = box.querySelector("input:not([type=hidden]),textarea,button:not([disabled])");
         if (focusable) focusable.focus({ preventScroll: true });
       }
     }
@@ -1126,17 +1128,17 @@ const Maps = {
   const readForm = () => {
     const f = new FormData(form);
     const going = f.get("presenza") === "si";
-    const guests = going && f.get("gruppo") === "insieme" ? guestNames() : [];
+    const total = going ? Number(f.get("partecipanti")) : 0;
     const dietary = going ? (f.get("allergieDettaglio") || "").trim() : "";
     return {
       nome: (f.get("nome") || "").trim(),
       cognome: (f.get("cognome") || "").trim(),
       presenza: f.get("presenza"),
-      gruppo: going ? f.get("gruppo") : "solo",
-      accompagnatori: guests.join("\n"),
-      partecipanti: going ? 1 + guests.length : 0,
+      gruppo: total > 1 ? "insieme" : "solo",
+      partecipanti: total,
       allergie: dietary ? "si" : "no",
       allergieDettaglio: dietary,
+      note: (f.get("note") || "").trim(),
       consenso: !!f.get("consenso"),
       evento: `${EVENT.name}-${EVENT.date}`
     };
@@ -1176,9 +1178,9 @@ const Maps = {
     form.reset();
     toggle(blocks.partecipanti, false);
     toggle(blocks.allergie, false);
-    updateGroup();
+    updateCounter(1);
     clearErrors();
-    $("#nome").focus();
+    form.querySelector('input[name="presenza"]').focus();
   });
 })();
 </script>

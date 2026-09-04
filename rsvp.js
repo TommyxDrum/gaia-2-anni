@@ -4,7 +4,7 @@
  * l'unica difesa. Sostituisci `persist()` con il tuo database.
  */
 
-const LIMITS = { nomeMin: 2, partecipantiMax: 20, notaMax: 500 };
+const LIMITS = { nomeMin: 2, partecipantiMax: 10, notaMax: 500 };
 
 function validate(data) {
   const e = {};
@@ -22,16 +22,10 @@ function validate(data) {
     if (data.allergie === "si" && str(data.allergieDettaglio).length < 3)
       e.allergieDettaglio = "Dettaglio allergie mancante.";
     if (str(data.allergieDettaglio).length > 500) e.allergieDettaglio = "Usa al massimo 500 caratteri.";
-    const guests = str(data.accompagnatori).split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-    if (!["solo", "insieme"].includes(data.gruppo)) e.accompagnatori = "Scegli per chi confermi.";
-    if (data.gruppo === "insieme" && !guests.length) e.accompagnatori = "Indica almeno un accompagnatore.";
-    if (data.gruppo === "solo" && guests.length) e.accompagnatori = "La conferma singola non include accompagnatori.";
-    if (guests.length > 19 || str(data.accompagnatori).length > 2000 || guests.some(s => s.length < 3 || s.length > 100))
-      e.accompagnatori = "Controlla i nominativi: massimo 19 persone, da 3 a 100 caratteri ciascuna, entro 2000 caratteri.";
-    if (n !== 1 + guests.length) e.partecipanti = "Il totale non corrisponde ai nominativi indicati.";
   }
 
   if (data.consenso !== true) e.consenso = "Consenso al trattamento dei dati mancante.";
+  if (str(data.note).length > LIMITS.notaMax) e.note = "Usa al massimo 500 caratteri.";
 
   return e;
 }
@@ -43,11 +37,10 @@ function sanitize(data) {
     cognome: clean(data.cognome),
     presenza: data.presenza,
     partecipanti: data.presenza === "si" ? Number(data.partecipanti) : 0,
-    gruppo: data.presenza === "si" ? data.gruppo : "solo",
-    accompagnatori: data.presenza === "si" && data.gruppo === "insieme"
-      ? data.accompagnatori.split(/\r?\n/).map(s => s.trim()).filter(Boolean).join("\n") : "",
+    gruppo: data.presenza === "si" && Number(data.partecipanti) > 1 ? "insieme" : "solo",
     allergie: data.presenza === "si" ? data.allergie : "no",
     allergieDettaglio: data.presenza === "si" && data.allergie === "si" ? clean(data.allergieDettaglio) : "",
+    note: clean(data.note),
     consenso: true,
     evento: clean(data.evento),
     createdAt: new Date().toISOString()
