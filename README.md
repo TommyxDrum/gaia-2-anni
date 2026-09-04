@@ -1,5 +1,19 @@
 # Gaia · 2 — invito digitale
 
+## Aggiornamento mobile
+
+Sotto i 720px il sito usa spaziature compatte, controlli touch, contenuti subito
+visibili e una foto WebP caricata in modo differito. La fotografia mantiene
+l'inquadratura completa. Il layout desktop e la foto originale restano invariati.
+
+Per pubblicare la versione attuale carica insieme `index.html`, `og-image.jpg`,
+`og-image2.jpg`, `gaia-mobile-480.webp` e `gaia-mobile-960.webp`.
+Le due nuove immagini pesano circa 29 e 110 KB e sono selezionate dal browser
+in base allo schermo. Su mobile “Portami lì” apre direttamente Google Maps,
+che gestisce il punto di partenza. Il modulo resta configurato con salvataggio locale.
+
+Le sezioni seguenti descrivono anche la configurazione originale con foto incorporate.
+
 File del progetto:
 
 - `index.html` — il sito completo. HTML, CSS, JavaScript **e le foto** sono in un unico file:
