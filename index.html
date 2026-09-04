@@ -426,17 +426,17 @@ body::after{
   .hero{
     min-height:auto;
     justify-content:flex-start;
-    padding-top:calc(clamp(112px,22svh,176px) + env(safe-area-inset-top));
+    padding-top:calc(clamp(64px,11svh,96px) + env(safe-area-inset-top));
     padding-bottom:40px;
   }
   .hero__two{
-    top:38%;
+    top:32%;
     right:2vw;
     font-size:clamp(180px,64vw,360px);
     opacity:.55;
   }
   .hero .deco--balloons{
-    top:38%;
+    top:32%;
     right:9vw;
     width:clamp(100px,28vw,150px);
     transform:translateY(-50%);
@@ -570,7 +570,7 @@ body::after{
 
 <!-- TOPBAR -->
 <header class="topbar" id="topbar">
-  <a href="#top" class="topbar__mark" aria-label="Torna all'inizio">2 anni di <span>Gaia</span></a>
+  <a href="#top" class="topbar__mark" aria-label="Torna all'inizio">Due anni di<span>Gaia</span></a>
   <a class="btn btn--mini" href="#rsvp">RSVP</a>
 </header>
 
@@ -617,7 +617,7 @@ body::after{
   <section class="section" aria-labelledby="invito-title">
     <div class="wrap">
       <p class="invito__lead reveal" id="invito-title">Due anni di sorrisi, scoperte e piccole grandi avventure.</p>
-      <p class="invito__text reveal reveal-d1">Saremmo felici di festeggiare insieme a voi il secondo compleanno di Gaia. Una piccola grande occasione da passare in compagnia.</p>
+      <p class="invito__text reveal reveal-d1">Siamo felici di festeggiare con voi il secondo compleanno di Gaia. Una piccola grande occasione da passare in allegria.</p>
       <div class="ornament reveal reveal-d2" aria-hidden="true" style="margin-top:var(--s8)">
         <svg style="width:26px" viewBox="0 0 24 24"><use href="#s-bloom"/></svg>
       </div>
@@ -652,9 +652,7 @@ body::after{
 
       <div class="dove__actions reveal reveal-d1">
         <a class="btn btn--primary" id="btn-maps" href="#" target="_blank" rel="noopener">Apri in Google Maps</a>
-        <button class="btn btn--ghost" id="btn-directions" type="button">Portami lì</button>
       </div>
-      <p class="dove__note" id="dove-note" role="status" aria-live="polite"></p>
 
       <div class="parking reveal reveal-d2">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
@@ -663,7 +661,7 @@ body::after{
         </svg>
         <div>
           <h3>Parcheggio</h3>
-          <p>Il locale non dispone di parcheggio interno. Ti consigliamo di arrivare con qualche minuto di anticipo per cercare posto nelle strade circostanti.</p>
+          <p>Il locale non dispone di parcheggio interno. Ti consigliamo di arrivare in anticipo per cercare posto nelle strade circostanti.</p>
         </div>
       </div>
     </div>
@@ -679,11 +677,11 @@ body::after{
 
     <div class="wrap">
       <h2 class="rsvp__title reveal" id="rsvp-title">Ci sarai?</h2>
-      <p class="rsvp__sub reveal reveal-d1">Facci sapere se festeggerai insieme a Gaia. Bastano trenta secondi.</p>
+      <p class="rsvp__sub reveal reveal-d1">Compila il form con le informazioni richieste</p>
 
       <form class="form reveal reveal-d1" id="rsvp-form" novalidate>
         <fieldset class="field" aria-describedby="err-presenza">
-          <legend>Parteciperai?</legend>
+          
           <div class="choice">
             <label><input type="radio" name="presenza" value="si" required><span>Sì, ci sarò</span></label>
             <label><input type="radio" name="presenza" value="no"><span>Purtroppo non potrò esserci</span></label>
@@ -720,7 +718,7 @@ body::after{
           <legend>Allergie e intolleranze</legend>
           <div>
             <label for="allergie-dettaglio">Ci sono esigenze alimentari da conoscere?</label>
-            <p class="hint" id="hint-allergie">Facoltativo. Indica la persona interessata e le sue allergie o intolleranze, per te e per chi viene con te. Se non ce ne sono, lascia vuoto.</p>
+            <p class="hint" id="hint-allergie">Facoltativo. Indica nome ed eventuali allergie o intolleranze, anche per chi ti accompagna. Se non ce ne sono, lascia vuoto.</p>
             <textarea class="textarea" id="allergie-dettaglio" name="allergieDettaglio"
                       rows="4" maxlength="500" placeholder="Es. Monica: allergia alla frutta secca. Luca: intolleranza al lattosio."
                       aria-describedby="hint-allergie err-allergie-dettaglio"></textarea>
@@ -730,7 +728,7 @@ body::after{
         </fieldset>
 
         <div class="field">
-          <label for="note">Note <span class="hint">Facoltativo. C'è altro che vuoi farci sapere?</span></label>
+          <label for="note">Note <span class="hint">Se vuoi, lascia qui un messaggio per la festeggiata</span></label>
           <textarea class="textarea" id="note" name="note" rows="3" maxlength="500" aria-describedby="err-note"></textarea>
           <span class="error" id="err-note" role="alert"></span>
         </div>
@@ -812,7 +810,7 @@ photo: {
   srcWide: "og-image2.jpg",
   srcMobile: "gaia-mobile-480.webp 480w, gaia-mobile-960.webp 960w",
   alt: "Gaia",
-  caption: "2 anni di Gaia"
+  caption: "La nostra festeggiata"
 },
 };
 
@@ -918,22 +916,7 @@ const Validation = {
    D. MAPS
    ============================================================ */
 const Maps = {
-  destination() { return `${EVENT.venue}, ${EVENT.street}, ${EVENT.city}`; },
-  placeUrl() { return EVENT.mapsUrl; },
-  directionsUrl(origin) {
-    const base = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(this.destination());
-    return origin ? `${base}&origin=${origin.lat},${origin.lng}` : base;
-  },
-  locate() {
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) return reject(new Error("unsupported"));
-      navigator.geolocation.getCurrentPosition(
-        p => resolve({ lat: p.coords.latitude.toFixed(6), lng: p.coords.longitude.toFixed(6) }),
-        err => reject(err),
-        { enableHighAccuracy: true, timeout: 9000, maximumAge: 60000 }
-      );
-    });
-  }
+  placeUrl() { return EVENT.mapsUrl; }
 };
 
 /* ============================================================
@@ -1040,38 +1023,6 @@ const Maps = {
     revealables.forEach(el => el.classList.add("is-in"));
   }
 
-  /* --- E6. Indicazioni stradali --------------------------- */
-  const btnDir = $("#btn-directions"), note = $("#dove-note");
-  btnDir.addEventListener("click", async () => {
-    if (mobile.matches) {
-      // Apri dal gesto dell'utente: Maps gestisce il punto di partenza.
-      window.open(Maps.directionsUrl(null), "_blank", "noopener");
-      return;
-    }
-    const original = btnDir.textContent;
-    btnDir.textContent = "Cerco la tua posizione…";
-    btnDir.disabled = true;
-    note.textContent = "";
-    try {
-      const pos = await Maps.locate();
-      window.open(Maps.directionsUrl(pos), "_blank", "noopener");
-    } catch (err) {
-      note.textContent = "";
-      const msg = document.createElement("span");
-      msg.textContent = (err && err.code === 1)
-        ? "Posizione non condivisa. "
-        : "Non riesco a rilevare la posizione. ";
-      const link = document.createElement("a");
-      link.href = Maps.directionsUrl(null);
-      link.target = "_blank"; link.rel = "noopener";
-      link.textContent = "Apri indicazioni su Google Maps";
-      note.append(msg, link);
-    } finally {
-      btnDir.textContent = original;
-      btnDir.disabled = false;
-    }
-  });
-
   /* --- E7. Form ------------------------------------------- */
   const form = $("#rsvp-form"), done = $("#done"), status = $("#form-status");
   const blocks = {
@@ -1162,10 +1113,10 @@ const Maps = {
     try {
       await RsvpStore.save(data);
       form.style.display = "none";
-      $("#done-title").textContent = data.presenza === "si" ? "Grazie! ♡" : "Grazie di avercelo detto ♡";
+      $("#done-title").textContent = data.presenza === "si" ? "Grazie! ♡" : "Grazie per la tua risposta ♡";
       $("#done-text").textContent = data.presenza === "si"
         ? `La tua conferma per ${data.partecipanti === 1 ? "1 persona" : data.partecipanti + " persone"} è stata registrata. Non vediamo l'ora di festeggiare insieme.`
-        : "La tua risposta è stata registrata. Ci mancherai, sarà per la prossima.";
+        : "Ci mancherai, sarà per la prossima volta.";
       done.classList.add("is-open");
       done.focus();
       done.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });

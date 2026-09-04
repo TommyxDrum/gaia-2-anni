@@ -29,8 +29,8 @@ per evitare lo zoom al doppio tocco senza impedire lo zoom con due dita.
 Per pubblicare la versione attuale carica insieme `index.html`, `og-image.jpg`,
 `og-image2.jpg`, `gaia-mobile-480.webp` e `gaia-mobile-960.webp`.
 Le due nuove immagini pesano circa 29 e 110 KB e sono selezionate dal browser
-in base allo schermo. Su mobile “Portami lì” apre direttamente Google Maps,
-che gestisce il punto di partenza. Il modulo resta configurato con salvataggio locale.
+in base allo schermo. Il pulsante “Apri in Google Maps” apre la scheda del locale.
+Il modulo resta configurato con salvataggio locale.
 
 Le sezioni seguenti descrivono anche la configurazione originale con foto incorporate.
 
