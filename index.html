@@ -331,7 +331,7 @@ body::after{
 
 .form{margin-top:var(--s8);max-width:560px}
 .guest-counter{display:flex;align-items:center;gap:16px;margin-top:16px}
-.guest-counter__button{width:54px;min-height:54px;padding:0;font-size:26px;line-height:1}
+.guest-counter__button{width:54px;min-height:54px;padding:0;font-size:26px;line-height:1;touch-action:manipulation;user-select:none;-webkit-user-select:none}
 .guest-counter__value{min-width:52px;text-align:center;font-family:var(--display);font-size:32px;font-variant-numeric:tabular-nums}
 .field{margin-bottom:var(--s6)}
 .field > label,.field legend{display:block;font-size:14.5px;font-weight:500;margin-bottom:var(--s3)}
@@ -436,13 +436,14 @@ body::after{
     opacity:.55;
   }
   .hero .deco--balloons{
-    top:calc(20px + env(safe-area-inset-top));
-    right:var(--pad);
-    width:clamp(64px,18vw,96px);
-    opacity:.8;
+    top:38%;
+    right:9vw;
+    width:clamp(100px,28vw,150px);
+    transform:translateY(-50%);
+    opacity:1;
   }
   .hero .deco--sprig{width:52px;opacity:.45}
-  .hero__date{font-size:12px;letter-spacing:.22em;margin-bottom:20px}
+  .hero__date{font-size:14px;letter-spacing:.18em;margin-bottom:20px}
   .hero__name{font-size:clamp(72px,22vw,112px);line-height:1;margin-bottom:12px}
   .hero__sub{font-size:clamp(25px,6.4vw,36px);margin-bottom:20px}
   .hero__meta{font-size:14px;line-height:1.7;letter-spacing:.02em;padding-top:20px}
@@ -461,14 +462,18 @@ body::after{
   .topbar{gap:12px}
   .topbar__mark{min-height:44px;font-size:18px;flex-wrap:wrap;gap:6px}
   .topbar .btn--mini{min-height:44px;flex-shrink:0}
+  .label{font-size:15px;letter-spacing:.12em}
+  .hint,.privacy,.error,.dove__note,.parking h3,.footer__note{font-size:15px;line-height:1.65}
+  .footer__date,.btn--mini{font-size:14px}
   .btn{white-space:normal;text-align:center;padding:12px 20px;line-height:1.45}
   .foto{padding-top:24px}
   .foto .deco--bloom{top:8px;width:36px}
-  .foto__frame img{aspect-ratio:1868 / 4000}
+  .foto__frame img{aspect-ratio:3 / 4;object-fit:cover;object-position:50% 58%}
   .foto figcaption{font-size:15px;padding-top:12px}
   .invito__lead{font-size:clamp(28px,7vw,40px)}
   .invito__text{margin-top:24px;font-size:16px;line-height:1.75}
   .quando__grid{gap:20px}
+  .quando__day{grid-row:1}
   .quando__num{font-size:clamp(96px,28vw,160px)}
   .quando__time{margin-top:20px;padding-top:16px}
   .dove__name{font-size:clamp(30px,8vw,48px);overflow-wrap:anywhere}

@@ -19,8 +19,12 @@ alter table rsvp add column if not exists gruppo text;
 ## Aggiornamento mobile
 
 Sotto i 720px il sito usa spaziature compatte, controlli touch, contenuti subito
-visibili e una foto WebP caricata in modo differito. La fotografia mantiene
-l'inquadratura completa. Il layout desktop e la foto originale restano invariati.
+visibili e una foto WebP caricata in modo differito. Su mobile la fotografia
+è ritagliata in CSS in formato 3:4, centrata sul soggetto; il file originale
+rimane integro. Il layout desktop e la foto desktop restano invariati.
+Le etichette e i testi più piccoli sono ingranditi, la data mostra prima il
+giorno della settimana e i pulsanti del contatore usano `touch-action: manipulation`
+per evitare lo zoom al doppio tocco senza impedire lo zoom con due dita.
 
 Per pubblicare la versione attuale carica insieme `index.html`, `og-image.jpg`,
 `og-image2.jpg`, `gaia-mobile-480.webp` e `gaia-mobile-960.webp`.
