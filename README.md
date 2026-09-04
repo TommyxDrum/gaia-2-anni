@@ -1,5 +1,22 @@
 # Gaia · 2 — invito digitale
 
+## Conferme singole e di gruppo
+
+Chi partecipa sceglie “Solo per me” oppure “Per me e altre persone”. Nel secondo
+caso inserisce i nominativi degli accompagnatori, uno per riga (massimo 19): il
+totale comprende automaticamente chi compila. Il campo facoltativo “Allergie e
+intolleranze” sostituisce le note e permette di indicare la persona interessata.
+
+Le risposte includono `gruppo` (`solo` / `insieme`) e `accompagnatori` (testo con
+un nominativo per riga), oltre al totale `partecipanti` e ai campi alimentari.
+Il campo `note` non viene più inviato. Se configuri Supabase con la tabella
+dell'esempio qui sotto, aggiungi prima le colonne:
+
+```sql
+alter table rsvp add column if not exists gruppo text;
+alter table rsvp add column if not exists accompagnatori text;
+```
+
 ## Aggiornamento mobile
 
 Sotto i 720px il sito usa spaziature compatte, controlli touch, contenuti subito

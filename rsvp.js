@@ -21,10 +21,17 @@ function validate(data) {
     if (!["si", "no"].includes(data.allergie)) e.allergie = "Valore allergie non valido.";
     if (data.allergie === "si" && str(data.allergieDettaglio).length < 3)
       e.allergieDettaglio = "Dettaglio allergie mancante.";
+    if (str(data.allergieDettaglio).length > 500) e.allergieDettaglio = "Usa al massimo 500 caratteri.";
+    const guests = str(data.accompagnatori).split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+    if (!["solo", "insieme"].includes(data.gruppo)) e.accompagnatori = "Scegli per chi confermi.";
+    if (data.gruppo === "insieme" && !guests.length) e.accompagnatori = "Indica almeno un accompagnatore.";
+    if (data.gruppo === "solo" && guests.length) e.accompagnatori = "La conferma singola non include accompagnatori.";
+    if (guests.length > 19 || str(data.accompagnatori).length > 2000 || guests.some(s => s.length < 3 || s.length > 100))
+      e.accompagnatori = "Controlla i nominativi: massimo 19 persone, da 3 a 100 caratteri ciascuna, entro 2000 caratteri.";
+    if (n !== 1 + guests.length) e.partecipanti = "Il totale non corrisponde ai nominativi indicati.";
   }
 
   if (data.consenso !== true) e.consenso = "Consenso al trattamento dei dati mancante.";
-  if (str(data.note).length > LIMITS.notaMax) e.note = "Nota troppo lunga.";
 
   return e;
 }
@@ -36,9 +43,11 @@ function sanitize(data) {
     cognome: clean(data.cognome),
     presenza: data.presenza,
     partecipanti: data.presenza === "si" ? Number(data.partecipanti) : 0,
+    gruppo: data.presenza === "si" ? data.gruppo : "solo",
+    accompagnatori: data.presenza === "si" && data.gruppo === "insieme"
+      ? data.accompagnatori.split(/\r?\n/).map(s => s.trim()).filter(Boolean).join("\n") : "",
     allergie: data.presenza === "si" ? data.allergie : "no",
-    allergieDettaglio: data.allergie === "si" ? clean(data.allergieDettaglio) : "",
-    note: clean(data.note),
+    allergieDettaglio: data.presenza === "si" && data.allergie === "si" ? clean(data.allergieDettaglio) : "",
     consenso: true,
     evento: clean(data.evento),
     createdAt: new Date().toISOString()

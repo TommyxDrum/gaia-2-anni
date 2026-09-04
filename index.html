@@ -695,35 +695,36 @@ body::after{
           <span class="error" id="err-presenza" role="alert"></span>
         </fieldset>
 
-        <div class="field conditional" id="blocco-partecipanti">
-          <label for="partecipanti">Numero di partecipanti
-            <span class="hint">Quante persone parteciperanno, compreso te?</span>
-          </label>
-          <input class="input" id="partecipanti" name="partecipanti" type="number" inputmode="numeric"
-                 min="1" max="20" step="1" value="1" aria-describedby="err-partecipanti">
+        <fieldset class="field conditional" id="blocco-partecipanti">
+          <legend>Per chi confermi?</legend>
+          <div class="choice">
+            <label><input type="radio" name="gruppo" value="solo" checked><span>Solo per me</span></label>
+            <label><input type="radio" name="gruppo" value="insieme"><span>Per me e altre persone</span></label>
+          </div>
+          <div class="conditional" id="blocco-accompagnatori">
+            <label for="accompagnatori">Chi verrà con te?</label>
+            <p class="hint" id="hint-accompagnatori">Scrivi nome e cognome di ogni altra persona, uno per riga, inclusi i bambini. Non aggiungere il tuo nome. Puoi indicare fino a 19 persone.</p>
+            <textarea class="textarea" id="accompagnatori" name="accompagnatori" rows="4" maxlength="2000"
+                      placeholder="Es. Monica Rossi&#10;Luca Rossi"
+                      aria-describedby="hint-accompagnatori err-accompagnatori"></textarea>
+            <span class="error" id="err-accompagnatori" role="alert"></span>
+          </div>
+          <p class="hint" id="riepilogo-partecipanti" role="status" aria-live="polite">Confermi per 1 persona: tu.</p>
           <span class="error" id="err-partecipanti" role="alert"></span>
-        </div>
+        </fieldset>
 
         <fieldset class="field conditional" id="blocco-allergie" aria-describedby="err-allergie">
-          <legend>Ci sono allergie, intolleranze o esigenze alimentari che dovremmo conoscere?</legend>
-          <div class="choice choice--row">
-            <label><input type="radio" name="allergie" value="no"><span>Nessuna</span></label>
-            <label><input type="radio" name="allergie" value="si"><span>Sì</span></label>
-          </div>
-          <div class="conditional" id="blocco-allergie-dettaglio">
-            <label for="allergie-dettaglio">Indicaci quali</label>
+          <legend>Allergie e intolleranze</legend>
+          <div>
+            <label for="allergie-dettaglio">Ci sono esigenze alimentari da conoscere?</label>
+            <p class="hint" id="hint-allergie">Facoltativo. Indica la persona interessata e le sue allergie o intolleranze, per te e per chi viene con te. Se non ce ne sono, lascia vuoto.</p>
             <textarea class="textarea" id="allergie-dettaglio" name="allergieDettaglio"
-                      placeholder="Es. allergia alla frutta secca, intolleranza al lattosio…"
-                      aria-describedby="err-allergie-dettaglio"></textarea>
+                      rows="4" maxlength="500" placeholder="Es. Monica: allergia alla frutta secca. Luca: intolleranza al lattosio."
+                      aria-describedby="hint-allergie err-allergie-dettaglio"></textarea>
             <span class="error" id="err-allergie-dettaglio" role="alert"></span>
           </div>
           <span class="error" id="err-allergie" role="alert"></span>
         </fieldset>
-
-        <div class="field">
-          <label for="note">Note <span class="hint">Facoltativo</span></label>
-          <textarea class="textarea" id="note" name="note" rows="3"></textarea>
-        </div>
 
         <div class="form__foot">
           <p class="privacy">I dati inseriti saranno utilizzati esclusivamente per organizzare la festa e gestire le conferme di partecipazione. Non vengono usati per marketing o profilazione.</p>
@@ -895,6 +896,11 @@ const Validation = {
       if (data.allergie !== "si" && data.allergie !== "no") e.allergie = "Facci sapere se ci sono allergie.";
       if (data.allergie === "si" && (!data.allergieDettaglio || data.allergieDettaglio.trim().length < 3))
         e.allergieDettaglio = "Scrivi quali allergie o intolleranze.";
+      if (data.allergieDettaglio.length > 500) e.allergieDettaglio = "Usa al massimo 500 caratteri.";
+      const guests = data.accompagnatori.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+      if (data.gruppo === "insieme" && !guests.length) e.accompagnatori = "Indica almeno una persona che verrà con te.";
+      if (guests.length > 19 || data.accompagnatori.length > 2000) e.accompagnatori = "Puoi indicare al massimo 19 persone, entro 2000 caratteri.";
+      if (guests.some(s => s.length < 3 || s.length > 100)) e.accompagnatori = "Controlla i nominativi: usa da 3 a 100 caratteri per persona.";
     }
     if (!data.consenso) e.consenso = "Serve il consenso per registrare la risposta.";
     return e;
@@ -1065,20 +1071,26 @@ const Maps = {
   const blocks = {
     partecipanti: $("#blocco-partecipanti"),
     allergie: $("#blocco-allergie"),
-    dettaglio: $("#blocco-allergie-dettaglio")
+    accompagnatori: $("#blocco-accompagnatori")
   };
   const toggle = (el, open) => el.classList.toggle("is-open", open);
+  const guestNames = () => $("#accompagnatori").value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  const updateGroup = () => {
+    const together = form.elements.gruppo.value === "insieme";
+    toggle(blocks.accompagnatori, together);
+    const total = 1 + (together ? guestNames().length : 0);
+    $("#riepilogo-partecipanti").textContent = total === 1
+      ? "Confermi per 1 persona: tu."
+      : `Confermi per ${total} persone in totale, te compreso.`;
+  };
+  $$('input[name="gruppo"]').forEach(r => r.addEventListener("change", updateGroup));
+  $("#accompagnatori").addEventListener("input", updateGroup);
 
   $$('input[name="presenza"]').forEach(r => r.addEventListener("change", () => {
     const going = r.value === "si" && r.checked;
     toggle(blocks.partecipanti, going);
     toggle(blocks.allergie, going);
-    toggle(blocks.dettaglio, going && form.elements.allergie.value === "si");
-  }));
-  $$('input[name="allergie"]').forEach(r => r.addEventListener("change", () => {
-    const yes = r.value === "si" && r.checked;
-    toggle(blocks.dettaglio, yes);
-    if (yes && !mobile.matches) setTimeout(() => $("#allergie-dettaglio").focus(), 60);
+    updateGroup();
   }));
 
   const clearErrors = () => {
@@ -1091,6 +1103,7 @@ const Maps = {
     const map = {
       nome: "#err-nome", cognome: "#err-cognome", presenza: "#err-presenza",
       partecipanti: "#err-partecipanti", allergie: "#err-allergie",
+      accompagnatori: "#err-accompagnatori",
       allergieDettaglio: "#err-allergie-dettaglio", consenso: "#err-consenso"
     };
     Object.entries(errors).forEach(([k, msg]) => {
@@ -1112,14 +1125,18 @@ const Maps = {
 
   const readForm = () => {
     const f = new FormData(form);
+    const going = f.get("presenza") === "si";
+    const guests = going && f.get("gruppo") === "insieme" ? guestNames() : [];
+    const dietary = going ? (f.get("allergieDettaglio") || "").trim() : "";
     return {
       nome: (f.get("nome") || "").trim(),
       cognome: (f.get("cognome") || "").trim(),
       presenza: f.get("presenza"),
-      partecipanti: f.get("presenza") === "si" ? Number(f.get("partecipanti")) : 0,
-      allergie: f.get("presenza") === "si" ? f.get("allergie") : "no",
-      allergieDettaglio: f.get("presenza") === "si" && f.get("allergie") === "si" ? (f.get("allergieDettaglio") || "").trim() : "",
-      note: (f.get("note") || "").trim(),
+      gruppo: going ? f.get("gruppo") : "solo",
+      accompagnatori: guests.join("\n"),
+      partecipanti: going ? 1 + guests.length : 0,
+      allergie: dietary ? "si" : "no",
+      allergieDettaglio: dietary,
       consenso: !!f.get("consenso"),
       evento: `${EVENT.name}-${EVENT.date}`
     };
@@ -1140,7 +1157,7 @@ const Maps = {
       form.style.display = "none";
       $("#done-title").textContent = data.presenza === "si" ? "Grazie! ♡" : "Grazie di avercelo detto ♡";
       $("#done-text").textContent = data.presenza === "si"
-        ? "La tua risposta è stata registrata. Non vediamo l'ora di festeggiare insieme."
+        ? `La tua conferma per ${data.partecipanti === 1 ? "1 persona" : data.partecipanti + " persone"} è stata registrata. Non vediamo l'ora di festeggiare insieme.`
         : "La tua risposta è stata registrata. Ci mancherai, sarà per la prossima.";
       done.classList.add("is-open");
       done.focus();
@@ -1159,7 +1176,7 @@ const Maps = {
     form.reset();
     toggle(blocks.partecipanti, false);
     toggle(blocks.allergie, false);
-    toggle(blocks.dettaglio, false);
+    updateGroup();
     clearErrors();
     $("#nome").focus();
   });
